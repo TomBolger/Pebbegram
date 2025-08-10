@@ -1,2 +1,2 @@
 # Pebbagram
-A pebble Telegram client
+A Pebble smartwatch Telegram client
