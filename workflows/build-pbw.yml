@@ -8,26 +8,32 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container: rebble/pebble-sdk:latest
+
     steps:
       - uses: actions/checkout@v4
 
-      # Kill the interactive analytics prompt
+      # Make sure the SDK won't prompt in CI
       - name: Disable Pebble SDK analytics prompt
         run: |
-          mkdir -p /github/home/.pebble-sdk /root/.pebble-sdk
-          touch /github/home/.pebble-sdk/NO_TRACKING
-          touch /root/.pebble-sdk/NO_TRACKING
-          # debug
-          ls -la /github/home/.pebble-sdk || true
-          ls -la /root/.pebble-sdk || true
+          echo "whoami=$(whoami)"
+          echo "HOME=$HOME"
+          mkdir -p "$HOME/.pebble-sdk"
+          touch "$HOME/.pebble-sdk/NO_TRACKING"
+          ls -la "$HOME/.pebble-sdk"
 
+      # Build (adjust folder name if yours isn't PebbleWatchApp_JSRelay)
       - name: Build watchapp
+        env:
+          HOME: /github/home
         run: |
-          cd PebbleWatchApp_JSRelay   # <- adjust if your folder name differs
-          pebble build
+          # defensive: create NO_TRACKING again under this step's HOME
+          mkdir -p "$HOME/.pebble-sdk"
+          touch "$HOME/.pebble-sdk/NO_TRACKING"
+          cd PebbleWatchApp_JSRelay
+          yes n | pebble build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: pebble-pbw
-          path: PebbleWatchApp_JSRelay/build/*.pbw  # <- adjust if folder name differs
+          path: PebbleWatchApp_JSRelay/build/*.pbw
