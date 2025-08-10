@@ -8,34 +8,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container: rebble/pebble-sdk:latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show repo tree (debug)
+      # Prevent the interactive analytics prompt
+      - name: Disable Pebble SDK analytics prompt
         run: |
-          pwd
-          ls -la
-          find . -maxdepth 4 -type f -name appinfo.json -print
-
-      - name: Find watchapp dir
-        id: finddir
-        run: |
-          set -e
-          DIR="$(find . -maxdepth 4 -type f -name appinfo.json -print | head -n1 | xargs dirname)"
-          if [ -z "$DIR" ]; then
-            echo "No appinfo.json found. Make sure you uploaded the watchapp folder."
-            exit 1
-          fi
-          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+          mkdir -p "$HOME/.pebble-sdk"
+          touch "$HOME/.pebble-sdk/NO_TRACKING"
 
       - name: Build watchapp
         run: |
-          cd "${{ steps.finddir.outputs.dir }}"
+          cd PebbleWatchApp_JSRelay   # <- change if your folder is named differently
           pebble build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: pebble-pbw
-          path: ${{ steps.finddir.outputs.dir }}/build/*.pbw
+          path: PebbleWatchApp_JSRelay/build/*.pbw  # <- adjust if you changed the folder name
