@@ -1,0 +1,21 @@
+name: Build PBW
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: rebble/pebble-sdk:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build watchapp
+        run: |
+          cd PebbleWatchApp_JSRelay
+          pebble build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pebble-pbw
+          path: PebbleWatchApp_JSRelay/build/*.pbw
