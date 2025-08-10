@@ -11,19 +11,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Prevent the interactive analytics prompt
+      # Kill the interactive analytics prompt
       - name: Disable Pebble SDK analytics prompt
         run: |
-          mkdir -p "$HOME/.pebble-sdk"
-          touch "$HOME/.pebble-sdk/NO_TRACKING"
+          mkdir -p /github/home/.pebble-sdk /root/.pebble-sdk
+          touch /github/home/.pebble-sdk/NO_TRACKING
+          touch /root/.pebble-sdk/NO_TRACKING
+          # debug
+          ls -la /github/home/.pebble-sdk || true
+          ls -la /root/.pebble-sdk || true
 
       - name: Build watchapp
         run: |
-          cd PebbleWatchApp_JSRelay   # <- change if your folder is named differently
+          cd PebbleWatchApp_JSRelay   # <- adjust if your folder name differs
           pebble build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: pebble-pbw
-          path: PebbleWatchApp_JSRelay/build/*.pbw  # <- adjust if you changed the folder name
+          path: PebbleWatchApp_JSRelay/build/*.pbw  # <- adjust if folder name differs
