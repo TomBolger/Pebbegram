@@ -7,25 +7,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: rebble/pebble-sdk:latest
+    # Image with Pebble SDK preinstalled (no network fetch)
+    container: andredumas/pebble-dev:latest
+
     steps:
       - uses: actions/checkout@v4
 
-      # Stop the Pebble SDK from asking the analytics question in CI
+      # Prevent interactive analytics prompt
       - name: Disable Pebble SDK analytics prompt
         run: |
           mkdir -p /github/home/.pebble-sdk /root/.pebble-sdk
           touch /github/home/.pebble-sdk/NO_TRACKING
           touch /root/.pebble-sdk/NO_TRACKING
 
-      # Auto-find the watchapp folder (looks for appinfo.json)
+      # Auto-find the watchapp directory (looks for appinfo.json)
       - name: Locate watchapp dir
         id: finddir
         run: |
           set -e
           DIR="$(find . -maxdepth 5 -type f -name appinfo.json -print | head -n1 | xargs dirname)"
           if [ -z "$DIR" ]; then
-            echo "No appinfo.json found in repo"; exit 1
+            echo "No appinfo.json found"; exit 1
           fi
           echo "dir=$DIR" >> "$GITHUB_OUTPUT"
           echo "Watchapp dir: $DIR"
