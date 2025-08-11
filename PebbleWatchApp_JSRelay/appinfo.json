@@ -5,7 +5,7 @@
   "companyName": "You",
   "versionCode": 2,
   "versionLabel": "0.2",
-  "sdkVersion": "4",
+  "sdkVersion": "3",
   "watchapp": {
     "watchface": false
   },
